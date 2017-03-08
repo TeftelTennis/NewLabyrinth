@@ -1,11 +1,10 @@
 #include <string>
-#include <functional>
 #include "treasure.h"
 
 
 string Treasure::tostring() {
     string res = "Treasure. Conntents : ";
-    res += content.tostring() + " ";
+    res += content->tostring() + " ";
     return res;
 }
 
@@ -14,6 +13,6 @@ Treasure::Treasure() {
 }
 
 Treasure::Treasure(LabyrinthObject Content) {
-    content = Content;
+    content = &Content;
     type = TYPE_TREASURE;
 }

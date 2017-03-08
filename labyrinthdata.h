@@ -8,13 +8,17 @@ using namespace std;
 
 class LabyrinthData {
 public:
+    LabyrinthData();
+
     double wallProb;
     vector<Treasure> treasures;
     bool useRandomTreasure;
     int treasureCount;
-    double loveToilets; // Если хочет ставить в сартир
+    double loveToilets; // Если хочет ставить в сартр
     double staticTreasureProb;
     bool canPutTreasureTogether;
+
+
 };
 
 #endif // LABYRINTHDATA_H

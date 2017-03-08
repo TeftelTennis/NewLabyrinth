@@ -24,9 +24,11 @@ public:
     vector<LabyrinthObject*> cell[MAXSIZE][MAXSIZE];
     string horizontWalls[MAXSIZE][MAXSIZE];
     string verticalWalls[MAXSIZE][MAXSIZE];
+    bool wasWall[MAXSIZE][MAXSIZE][MAXSIZE];
     LabyrinthData data;
 
     Labyrinth(int w, int h);
+    Labyrinth();
     bool checkPos(int i, int j);
     //По кордам и направлению дает новые корды.
     pair<int, int> move(int i, int j, Direction direct);
@@ -35,9 +37,8 @@ public:
     tuple<int, int, int> findPlayer(string name);
     void movePlayer(string name, Direction direct);
     void killPlayer(string name);
-    void addObject(int i, int j, LabyrinthObject item) ;
+    void addObject(int i, int j, LabyrinthObject* item) ;
     void makeBorder();
-    bool wasWall[MAXSIZE][MAXSIZE][MAXSIZE];
     void create();
 };
 

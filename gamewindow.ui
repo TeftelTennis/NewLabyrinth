@@ -15,11 +15,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QGraphicsView" name="graphicsView">
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
-    </widget>
+    <widget class="QGraphicsView" name="graphicsView"/>
    </item>
   </layout>
  </widget>

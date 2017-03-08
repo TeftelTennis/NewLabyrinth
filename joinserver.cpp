@@ -21,16 +21,6 @@ void JoinServer::on_returnButton_clicked()
 
 void JoinServer::on_connectButton_clicked()
 {
-    GameWindow *game = new GameWindow(this);
-    try {
-        // game->getParamsFromServer() -- берем инфу с сервака по айпишнику
-        // game->setPlayerCoors() -- как-то так наверное
-        game->setWindowTitle("Labyrinth");
-        game->setModal(true);
-        hide();
-        game->exec();
-        show();
-    } catch (...) {
-        // если соснули на гетпарамс, то можно показать окошко типа соснули
-    }
+    //TODO: open OpenGL window
+
 }

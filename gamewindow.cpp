@@ -1,5 +1,8 @@
 #include "gamewindow.h"
 #include "ui_gamewindow.h"
+#include <iostream>
+
+using namespace std;
 
 GameWindow::GameWindow(QWidget *parent) :
     QDialog(parent),
@@ -8,9 +11,8 @@ GameWindow::GameWindow(QWidget *parent) :
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
-//    controls = new QGraphicsTextItem("Controls: ");
-//    wsad = new QGraphicsTextItem("WSAD -- move");
-//    shdg = new QGraphicsTextItem("K -- shoot L -- dig");
+    cerr << "created";
+
 }
 
 GameWindow::~GameWindow()
@@ -24,6 +26,69 @@ int GameWindow::getPosFromXCoor() {
 
 int GameWindow::getPosFromYCoor() {
     return 10 + (yCoors - 1) * (boxWidth + wallWidth);
+}
+
+void GameWindow::setParams(bool isServer, string name, int x, int y, ServerData serverData) {
+
+      cerr << "paramsstart";
+    this->name = name;
+
+    this->isServer = isServer;
+    if (isServer) {
+        server = new Server(serverData);
+        server->addPlayer(x, y, name);
+        server->addPlayer(0, 1, "nigga");
+    }
+    else {
+        //client = Client(serverData);
+        //clientAddPlayer(name, x, y);
+    }
+    summaryWidth = serverData.width * boxWidth + (serverData.width - 1) * wallWidth;
+    summaryHeight = serverData.height * boxWidth + (serverData.height - 1) * wallWidth;
+    this->resize(summaryWidth + 300, std::max(summaryHeight, 500) + 50);
+    xCoors = x + 1;
+    yCoors = serverData.height - 1;
+    keys = 0;
+    bullets = serverData.startAmmo;
+    width = serverData.width;
+    height = serverData.height;
+    initialize();
+}
+
+
+void GameWindow::keyPressEvent(QKeyEvent *key) {
+    switch (key->key()) {
+        case Qt::Key_Escape:
+            close();
+            break;
+        case Qt::Key_W:
+            move("up");
+            break;
+        case Qt::Key_A:
+            move("left");
+            break;
+        case Qt::Key_D:
+            move("right");
+            break;
+        case Qt::Key_S:
+            move("down");
+            break;
+        case Qt::Key_I:
+            shoot("up");
+            break;
+        case Qt::Key_J:
+            shoot("left");
+            break;
+        case Qt::Key_K:
+            shoot("down");
+            break;
+        case Qt::Key_L:
+            shoot("right");
+            break;
+        case Qt::Key_Q:
+            dig();
+            break;
+    }
 }
 
 void GameWindow::initialize() {
@@ -40,8 +105,8 @@ void GameWindow::initialize() {
 
     controls = scene->addText("Controls: ", QFont("Times", 16, QFont::Bold));
     wsad = scene->addText("WSAD -- move");
-    sh = scene->addText("K -- shoot");
-    dg = scene->addText("L -- dig");
+    sh = scene->addText("IKJL -- shoot (WSAD)");
+    dg = scene->addText("Q -- dig");
     inventory = scene->addText("Inventory", QFont("Times", 16, QFont::Bold));
     QGraphicsTextItem *keyText = scene->addText("Keys", QFont("Times", 13, QFont::Bold));
     QGraphicsTextItem *bulletText = scene->addText("Bullets", QFont("Times", 13, QFont::Bold));
@@ -94,64 +159,6 @@ void GameWindow::initialize() {
 
 }
 
-void GameWindow::setParams(int width, int height, int xCoors, int yCoors, int startAmmo,
-               int startLifes, int keys, int bullets, int mines) {
-    //Беру ширину и длину поля
-    this->width = width;
-    this->height = height;
-    summaryWidth = width * boxWidth + (width - 1) * wallWidth;
-    summaryHeight = height * boxWidth + (height - 1) * wallWidth;
-    this->resize(summaryWidth + 300, std::max(summaryHeight, 500) + 50);
-
-    //Беру кооры игрока, в инициализации нужно
-    this->xCoors = xCoors;
-    this->yCoors = yCoors;
-
-
-    this->startAmmo = startAmmo;
-    this->startLifes = startLifes;
-    this->keys = keys;
-    this->bullets = bullets;
-    this->mines = mines;
-
-    initialize(); //собсна инициализируем поле. вызывается один раз, когда игрок коннектится
-}
-
-void GameWindow::setParamsFloat(float wallProb, float staticTreasureProb, float loveToiletsProb,
-                    bool canPutTreasureTogether, bool useRandomTreasure) {
-    this->wallProb = wallProb;
-    this->staticTreasureProb = staticTreasureProb;
-    this->loveToiletsProb = loveToiletsProb;
-    this->canPutTreasureTogether = canPutTreasureTogether;
-    this->useRandomTreasure = useRandomTreasure;
-}
-
-void GameWindow::keyPressEvent(QKeyEvent *key) {
-    switch (key->key()) {
-        case Qt::Key_Escape:
-            close();
-            break;
-        case Qt::Key_W:
-            move(1);
-            break;
-        case Qt::Key_D:
-            move(2);
-            break;
-        case Qt::Key_A:
-            move(0);
-            break;
-        case Qt::Key_S:
-            move(3);
-            break;
-        case Qt::Key_K:
-            shoot();
-            break;
-        case Qt::Key_L:
-            dig();
-            break;
-    }
-}
-
 void GameWindow::update() {
     playerXCoor = getPosFromXCoor();
     playerYCoor = getPosFromYCoor();
@@ -174,47 +181,57 @@ void GameWindow::updateInfo() {
     }
 }
 
-void GameWindow::move(int direction) {
+void GameWindow::move(string direction) {
     int i = movePlayer(direction);
+    int dir;
+    if (direction == "left") {
+        dir = 1;
+    } else if (direction == "up") {
+        dir = 0;
+    } else if (direction == "right") {
+        dir = 3;
+    } else {
+        dir = 2;
+    }
     switch (i) {
         case 0:
-            switch (direction) {
+            switch (dir) {
             case 0:
-                xCoors--;
-                break;
-            case 1:
                 yCoors--;
                 break;
+            case 1:
+                xCoors--;
+                break;
             case 2:
-                xCoors++;
+                yCoors++;
                 break;
             case 3:
-                yCoors++;
+                xCoors++;
                 break;
             }
 
             update();
             break;
         case 1:
-            drawWall(xCoors, yCoors, direction);
+            drawWall(xCoors, yCoors, dir);
             break;
         case 2:
-            switch (direction) {
+            switch (dir) {
             case 0:
-                xCoors--;
-                break;
-            case 1:
                 yCoors--;
                 break;
+            case 1:
+                xCoors--;
+                break;
             case 2:
-                xCoors++;
+                yCoors++;
                 break;
             case 3:
-                yCoors++;
+                xCoors++;
                 break;
             }
 
-        update();
+            update();
             showTreasureText();
             break;
         case 3:
@@ -223,11 +240,17 @@ void GameWindow::move(int direction) {
     }
 }
 
-int GameWindow::movePlayer(int direction) { //direction: 0 - left, 1 - up, 2 - right, 3 - down
+int GameWindow::movePlayer(string direction) { //direction: 0 - up, 1 - left, 2 - down, 3 - right
     //return 0 if player can get to that direction
     //return 1 if there is a wall
     //return 2 if we can move and there is a treasure
     //return 3 if we can move and there is a mine
+    if (isServer) {
+        /* return */ server->move(name, direction);
+    }
+    else {
+        //
+    }
     return 0;
 }
 
@@ -280,15 +303,22 @@ void GameWindow::drawWall(int curXCoor, int curYCoor, int direction) {
     scene->addLine(line, pen);
 }
 
-void GameWindow::shoot() {
+void GameWindow::shoot(string direction) {
+    cerr << "shoot";
+    if (isServer) {
+        cerr << "shoot started\n";
+        server->shoot(name, direction, 3);
+    }
     //if killed someone then showKillText()
 }
 
 void GameWindow::dig() {
+    if (isServer) {
+        server->dig(name);
+    }
+    hideTreasureText();
     //+1 to players stash
     //remove treasure sector from this position
-
-    hideTreasureText();
 }
 
 void GameWindow::showTreasureText() {

@@ -24,7 +24,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     labyrinth.cpp \
     item.cpp \
     treasure.cpp \
@@ -37,10 +36,16 @@ SOURCES += main.cpp\
     joinserver.cpp \
     menuwindow.cpp \
     hostserver.cpp \
-    gamewindow.cpp
+    gamewindow.cpp \
+    serverdata.cpp \
+    server.cpp \
+    network.cpp \
+    splitter.cpp \
+    labyrinthobjectfactory.cpp\
+    trap.cpp \
+    client.cpp
 
-HEADERS  += mainwindow.h \
-    labyrinth.h \
+HEADERS  += labyrinth.h \
     item.h \
     treasure.h \
     player.h \
@@ -52,13 +57,19 @@ HEADERS  += mainwindow.h \
     joinserver.h \
     menuwindow.h \
     hostserver.h \
-    gamewindow.h
+    gamewindow.h \
+    serverdata.h \
+    server.h \
+    network.h \
+    splitter.h \
+    labyrinthobjectfactory.h \
+    trap.h \
+    client.h
 
-FORMS    += mainwindow.ui \
-    joinserver.ui \
+FORMS    +=    joinserver.ui \
     menuwindow.ui \
     hostserver.ui \
     gamewindow.ui
 
-RESOURCES += \
-    resources.qrc
+RESOURCES +=   resources.qrc
+

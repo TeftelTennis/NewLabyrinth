@@ -4,12 +4,29 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <iostream>
+
 
 using namespace std;
 
 Labyrinth::Labyrinth(int w, int h) {
     this->w = w;
     this->h = h;
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w + 1; j++) {
+            verticalWalls[i][j] = "empty";
+        }
+    }
+    for (int i = 0; i < h + 1; i++) {
+        for (int j = 0; j < w; j++) {
+            horizontWalls[i][j] = "empty";
+        }
+    }
+}
+Labyrinth::Labyrinth() {
+    cerr << "WTF";
+    this->w = 10;
+    this->h = 10;
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w + 1; j++) {
             verticalWalls[i][j] = "empty";
@@ -106,7 +123,6 @@ void Labyrinth::movePlayer(string name, Direction direct) {
     player->j = j;
     player->k = cell[i][j].size();
     cell[i][j].push_back(player);
-
 }
 
 void Labyrinth::killPlayer(string name) {
@@ -116,11 +132,11 @@ void Labyrinth::killPlayer(string name) {
     player->alive = false;
 }
 
-void Labyrinth::addObject(int i, int j, LabyrinthObject item) {
-    item.i = i;
-    item.j = j;
-    item.k = cell[i][j].size();
-    cell[i][j].push_back(&item);
+void Labyrinth::addObject(int i, int j, LabyrinthObject* item) {
+    item->i = i;
+    item->j = j;
+    item->k = cell[i][j].size();
+    cell[i][j].push_back(item);
 }
 
 void Labyrinth:: makeBorder() {
@@ -136,10 +152,11 @@ void Labyrinth:: makeBorder() {
 
 
 void Labyrinth::create() {
-    DSU dsu = DSU(w, h);
+    DSU* dsu = new DSU(w, h);
+
 
     //Строит рандомный остов.
-    while (dsu.k > 1) {
+    while (dsu->k > 1) {
         int i = rand() % h;
         int j = rand() % w;
         int k = rand() % 4;
@@ -148,15 +165,14 @@ void Labyrinth::create() {
         //var k : int = Mathf.RoundToInt(Random.Range(-0.5 + float.Epsilon, 4 - 0.5 - float.Epsilon));
         pair<int, int> newPos = move(i, j, Direction(k));
         if (checkPos(newPos.first, newPos.second)) {
-            int lastk = dsu.k;
-            dsu.merge(i, j, newPos.first, newPos.second);
-            if (lastk > dsu.k) {
+            int lastk = dsu->k;
+            dsu->merge(i, j, newPos.first, newPos.second);
+            if (lastk > dsu->k) {
                 wasWall[i][j][k] = true;
                 wasWall[newPos.first][newPos.second][(k + 2) % 4] = true;
             }
         }
     }
-
     //Ставит  остальные стены
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
@@ -174,15 +190,16 @@ void Labyrinth::create() {
     int pos = 0;
 
     //Put treasures
-    for (int i = 0; i <= data.treasureCount; i++) {
-        Treasure treasure;
-        if (i == 0)
-            treasure = Treasure(Key());
+    for (int i = 0; i <= data.treasures.size(); i++) {
+        Treasure* treasure;
+        if (i == 0) {
+            treasure = new Treasure(Key());
+        }
         else
             if (data.useRandomTreasure) {
-                treasure = data.treasures[rand() % data.treasures.size()];
+                treasure = &data.treasures[rand() % data.treasures.size()];
             } else {
-                treasure = data.treasures[pos++];
+                treasure = &data.treasures[pos++];
             }
         pair<int, int> treasurePos;
         int seed = 0; // How many times you tried to choose

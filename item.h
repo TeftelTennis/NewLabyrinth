@@ -12,18 +12,18 @@ class Direction;
 
 class Item : public LabyrinthObject {
 public:
-    int ITEM_TYPE_EMPTY = 0;
-    int ITEM_TYPE_FLOWER = 1;
-    int ITEM_TYPE_ARMOR_PIERCING_BULLET = 2;
-    int ITEM_TYPE_BULLET = 3;
-    int ITEM_TYPE_KEY = 4;
+    int static const ITEM_TYPE_EMPTY = 0;
+    int static const ITEM_TYPE_FLOWER = 1;
+    int static const ITEM_TYPE_ARMOR_PIERCING_BULLET = 2;
+    int static const ITEM_TYPE_BULLET = 3;
+    int static const ITEM_TYPE_KEY = 4;
 
     int itemType;
     string tostring();
     //virtual void infoWindow (int windowID);
-    virtual void hitPlayer (Player player, Labyrinth field);
+    virtual void hitPlayer (Player& player, Labyrinth* field);
     virtual bool hitWall(Direction direction);
-    virtual void useaa(Player player, Labyrinth field);
+    virtual void useaa(Player& player, Labyrinth* field);
 
     //Texture image;
 
@@ -44,7 +44,7 @@ public:
 
 class Bullet : public Item {
 public:
-    void hitPlayer(Player player, Labyrinth field);
+    void hitPlayer(Player& player, Labyrinth* field);
     Bullet();
 };
 
